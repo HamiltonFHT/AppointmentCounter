@@ -25,6 +25,8 @@ root.withdraw()
 
 appointments = {}
 currentPatient = ''
+#Select whether to output patient # (anonymous = True) or patient name (anonymous = False)
+anonymous = True
 
 #Get user to select a file
 filename = askopenfilename(title='Select a PSS patient appointment report to analyze')
@@ -42,16 +44,17 @@ with open(filename, 'r') as f:
         #If first entry in row is a number (Patient ID)
         #Begin counting appointment for a new patient
         elif row[0].isdigit():
-            currentPatient = ", ".join(reversed(row[1:3]))
+            if anonymous:
+                #current patient is patient ID #
+                currentPatient = row[0]
+            else:
+                #Current patient is "Lastname, Firstname"
+                currentPatient = ", ".join(reversed(row[1:3]))
             appointments[currentPatient] = 0
-            print(currentPatient)
         #If the appointment has 'cancelled' or 'deleted' in the title, skip it
         #Otherwise, increase the number of appointments by 1
-        elif (not 'deleted' in row[0] and
-                not 'cancelled' in row[0] and
-                not 'CANCELLED' in row[0] and
-                not 'DELETED' in row[0]):
-                appointments[currentPatient] += 1
+        elif not 'delete' in row[0].lower() and not 'cancel' in row[0].lower():
+            appointments[currentPatient] += 1
         else:
             continue
 
